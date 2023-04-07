@@ -1,0 +1,101 @@
+# Imports
+import pygame
+import random
+import time
+from pygame.locals import K_ESCAPE, KEYDOWN, QUIT
+pygame.init()
+# ------------------------------------------------
+# Variables
+FPS = 100
+WIDTH = 800
+HEIGHT = 500
+SIZE = (WIDTH, HEIGHT)
+
+BLACK = (0,0,0)
+WHITE =(255,255,255)
+BALLCOLOUR = (255,255,255)
+BACKGROUND = (12,20,69)
+
+ORANGE = (255,165,0)
+CYAN = (0,255,255)
+PURPLE = (230,230,250)
+YELLOW = (255,255,0)
+PINK = (255,0,255)
+BLUE = (30,144,255)
+colours = [ORANGE, CYAN, PURPLE, YELLOW, PINK, BLUE]
+
+score = 0
+countdown = 3500
+
+x = 400
+y = 270
+
+clicked = False
+pos_change = False
+start = False
+# ------------------------------------------------
+# Game Infrastructure
+screen = pygame.display.set_mode(SIZE)
+pygame.display.set_caption("AIM TRAINER")
+clock = pygame.time.Clock()
+# ------------------------------------------------
+# Main Loop
+done =  False
+while not done:
+    for event in pygame.event.get():
+        if event.type == KEYDOWN:
+            if event.key == K_ESCAPE:
+                done = True
+        elif event.type == QUIT:
+            done = True
+    
+    if pos_change == True:
+        BALLCOLOUR = (12,20,69)
+        x = random.randrange(20,780)
+        y = random.randrange(60,480)
+    else:
+        BALLCOLOUR = (255,255,255)
+# ------------------------------------------------
+# Drawing
+    screen.fill(BACKGROUND)
+    pygame.draw.line(screen, WHITE, [0,38],[800,38], 2)
+    font = pygame.font.Font(None,34)
+    text = font.render("Time: " + str(countdown),1, WHITE)
+    screen.blit(text, (20,10))
+    text = font.render("Score: " + str(score),1, WHITE)
+    screen.blit(text, (680,10))
+
+    if start == False:
+        text = font.render("CLICK BALL TO START",1, random.choice(colours))
+        screen.blit(text, (275,10))
+    
+    target = pygame.draw.circle(screen, BALLCOLOUR, [x,y],20)
+# ------------------------------------------------
+# Target Pos Change
+    pos = pygame.mouse.get_pos()
+    if target.collidepoint(pos):
+        if pygame.mouse.get_pressed()[0] == 1 and clicked == False:
+            clicked = True
+            pos_change = True
+            start = True
+            score += 1
+    if pygame.mouse.get_pressed()[0] == 0:
+        clicked = False
+        pos_change = False
+# ------------------------------------------------
+# Countdown
+    if start == True:
+        countdown -= 1
+    if countdown <= 0:
+        pygame.draw.rect(screen, BLACK, (210,250,380,40))
+        pygame.draw.rect(screen, WHITE, (210,250,380,40),2)
+        text = font.render("TIME'S UP / YOUR SCORE IS: " + str(score),1, WHITE)
+        screen.blit(text, (224,260))
+    if countdown == -2:
+        time.sleep(500)
+# ------------------------------------------------
+# Screen Updater
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
